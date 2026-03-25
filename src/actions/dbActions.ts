@@ -17,7 +17,7 @@ export async function getOrCreateUser(name: string, targetCalories: number) {
   const newUser = await db.insert(users).values({
     name,
     targetCalories,
-  }).returning(); // .returning() asks Postgres to send back the created row
+  }).returning();
 
   return newUser[0];
 }
@@ -36,7 +36,6 @@ export async function getOrCreateTodayLog(userId: number) {
     return log[0];
   }
 
-  // for dynamic vibe
   // First meal of the day! Create a new log.
   const newLog = await db.insert(dailyLogs).values({
     userId,
@@ -48,7 +47,7 @@ export async function getOrCreateTodayLog(userId: number) {
   return newLog[0];
 }
 
-//addfood
+// FIXED: Added proper return statement
 export async function addFoodEntry(
   userId: number, 
   rawInput: string, 
@@ -56,34 +55,44 @@ export async function addFoodEntry(
   calories: number, 
   proteinGrams: number
 ) {
-  // 1. Ensure we have a log for today
-  const todayLog = await getOrCreateTodayLog(userId);
+  try {
+    // 1. Ensure we have a log for today
+    const todayLog = await getOrCreateTodayLog(userId);
 
-  // 2. Insert the specific food item
-  await db.insert(foodEntries).values({
-    logId: todayLog.id,
-    rawInput,
-    englishTranslation,
-    calories,
-    proteinGrams,
-  });
+    // 2. Insert the specific food item
+    await db.insert(foodEntries).values({
+      logId: todayLog.id,
+      rawInput,
+      englishTranslation,
+      calories,
+      proteinGrams,
+    });
 
-  // 3. Update the total calories for the day
-  const newTotal = (todayLog.totalCaloriesLogged || 0) + calories;
-  
-  // 4. (Optional) Basic Dynamic Vibe Logic Check
-  // If they eat way too much, change the AI mood to "Strict Coach"
-  let newMood = todayLog.aiMood;
-  if (newTotal > 2500) { 
-    newMood = "Strict Coach";
+    // 3. Update the total calories for the day
+    const newTotal = (todayLog.totalCaloriesLogged || 0) + calories;
+    
+    // 4. Dynamic Vibe Logic
+    let newMood = todayLog.aiMood;
+    if (newTotal > 2500) { 
+      newMood = "Strict Coach";
+    }
+
+    // 5. Update the daily log
+    await db.update(dailyLogs)
+      .set({ totalCaloriesLogged: newTotal, aiMood: newMood })
+      .where(eq(dailyLogs.id, todayLog.id));
+
+    // 6. Revalidate the page
+    revalidatePath('/');
+    
+    // FIX: Return the values needed by the tool
+    return { 
+      newTotal, 
+      newMood 
+    };
+    
+  } catch (error) {
+    console.error('Error in addFoodEntry:', error);
+    throw error; // Re-throw so the tool can catch it
   }
-
-  await db.update(dailyLogs)
-    .set({ totalCaloriesLogged: newTotal, aiMood: newMood })
-    .where(eq(dailyLogs.id, todayLog.id));
-
-  // 5. Tell Next.js to instantly update the UI without refreshing the page
-  revalidatePath('/');
-  
-  return { success: true, newTotal, newMood };
 }
