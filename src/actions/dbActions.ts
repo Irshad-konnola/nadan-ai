@@ -1,7 +1,7 @@
 'use server';
 
-import { db } from '../db';
-import { users, dailyLogs, foodEntries } from '../db/schema';
+import { db } from '@/db';
+import { users, dailyLogs, foodEntries } from '@/db/schema';
 import { eq, and } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 

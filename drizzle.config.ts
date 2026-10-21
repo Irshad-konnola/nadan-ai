@@ -1,14 +1,15 @@
 import { config } from 'dotenv';
 import { defineConfig } from "drizzle-kit";
 
-// Load the .env.local variables
+// Load local environment files (.env.local has priority over .env)
 config({ path: '.env.local' });
+config({ path: '.env' });
 
 export default defineConfig({
   schema: "./src/db/schema.ts",
-  out: "./drizzle", // Where migration files will be saved
+  out: "./drizzle",
   dialect: "postgresql",
   dbCredentials: {
-    url: process.env.DATABASE_URL!,
+    url: process.env.DATABASE_URL || '',
   },
 });

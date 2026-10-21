@@ -1,14 +1,38 @@
 
 'use client';
 
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useRef, useState, useCallback, useSyncExternalStore } from 'react';
 
 /* ── Types ───────────────────────────────────────── */
+interface ToolInvocation {
+  toolName: string;
+  toolCallId?: string;
+  state: 'call' | 'result';
+  args?: {
+    rawInput?: string;
+    englishTranslation?: string;
+    calories?: number;
+    proteinGrams?: number;
+  };
+  result?: {
+    success?: boolean;
+    message?: string;
+    newTotal?: number;
+    newMood?: string;
+  };
+}
+
+interface MessagePart {
+  type: string;
+  text?: string;
+  toolInvocation?: ToolInvocation;
+}
+
 interface Message {
   id: string;
   role: 'user' | 'assistant';
   content: string;
-  parts: Array<{ type: string; text?: string; toolInvocation?: any }>;
+  parts: MessagePart[];
   timestamp?: Date;
 }
 
@@ -23,25 +47,40 @@ const SUGGESTIONS = [
 ];
 
 /* ── Theme Hook ──────────────────────────────────── */
+function subscribeTheme(callback: () => void) {
+  window.addEventListener('storage', callback);
+  const media = window.matchMedia('(prefers-color-scheme: dark)');
+  media.addEventListener('change', callback);
+  return () => {
+    window.removeEventListener('storage', callback);
+    media.removeEventListener('change', callback);
+  };
+}
+
+function getThemeSnapshot(): 'light' | 'dark' {
+  if (typeof window === 'undefined') return 'light';
+  const saved = localStorage.getItem('nadan-theme');
+  if (saved === 'light' || saved === 'dark') return saved;
+  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+}
+
+function getThemeServerSnapshot(): 'light' | 'dark' {
+  return 'light';
+}
+
 function useTheme() {
-  const [theme, setTheme] = useState<'light' | 'dark'>('light');
+  const theme = useSyncExternalStore(subscribeTheme, getThemeSnapshot, getThemeServerSnapshot);
 
   useEffect(() => {
-    const saved = localStorage.getItem('nadan-theme') as 'light' | 'dark' | null;
-    const preferred = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-    const initial = saved ?? preferred;
-    setTheme(initial);
-    document.documentElement.classList.toggle('dark', initial === 'dark');
-  }, []);
+    document.documentElement.classList.toggle('dark', theme === 'dark');
+  }, [theme]);
 
   const toggle = useCallback(() => {
-    setTheme(prev => {
-      const next = prev === 'light' ? 'dark' : 'light';
-      document.documentElement.classList.toggle('dark', next === 'dark');
-      localStorage.setItem('nadan-theme', next);
-      return next;
-    });
-  }, []);
+    const next = theme === 'light' ? 'dark' : 'light';
+    localStorage.setItem('nadan-theme', next);
+    document.documentElement.classList.toggle('dark', next === 'dark');
+    window.dispatchEvent(new Event('storage'));
+  }, [theme]);
 
   return { theme, toggle };
 }
@@ -75,13 +114,6 @@ function LeafIcon({ size = 20 }: { size?: number }) {
     </svg>
   );
 }
-function SparkleIcon() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-      <path d="M12 2l2.4 7.6H22l-6.2 4.5 2.4 7.6L12 17.2 5.8 21.7l2.4-7.6L2 9.6h7.6z"/>
-    </svg>
-  );
-}
 function HistoryIcon() {
   return (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -112,7 +144,22 @@ function ThinkingDots() {
 }
 
 /* ── Food Log Card (tool result) ─────────────────── */
-function FoodLogCard({ result, args }: { result: any; args: any }) {
+interface FoodLogCardProps {
+  result?: {
+    success?: boolean;
+    message?: string;
+    newTotal?: number;
+    newMood?: string;
+  };
+  args?: {
+    rawInput?: string;
+    englishTranslation?: string;
+    calories?: number;
+    proteinGrams?: number;
+  };
+}
+
+function FoodLogCard({ result, args }: FoodLogCardProps) {
   if (!result?.success) {
     return (
       <div style={{
@@ -251,7 +298,7 @@ function EmptyState({ onChipClick }: { onChipClick: (text: string) => void }) {
           Ente Kazhicha Kariyam 🍃
         </h2>
         <p style={{ fontSize: 14, color: 'var(--muted-foreground)', lineHeight: 1.7, margin: 0 }}>
-          Tell me what you ate — in <strong>English</strong>, <strong>Manglish</strong>, or <strong>Malayalam</strong>. I'll track the calories, protein, and more.
+          Tell me what you ate — in <strong>English</strong>, <strong>Manglish</strong>, or <strong>Malayalam</strong>. I&apos;ll track the calories, protein, and more.
         </p>
       </div>
 

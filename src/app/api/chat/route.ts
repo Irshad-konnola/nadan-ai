@@ -1,7 +1,7 @@
 import { streamText, tool } from 'ai';
 import { google } from '@ai-sdk/google';
 import { z } from 'zod';
-import { addFoodEntry, getOrCreateUser } from '../../../actions/dbActions';
+import { addFoodEntry, getOrCreateUser } from '@/actions/dbActions';
 
 // Allow streaming responses up to 30 seconds
 export const maxDuration = 30;
