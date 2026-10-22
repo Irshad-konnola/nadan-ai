@@ -1,139 +1,90 @@
-# Nadan AI — നാടൻ കലോറി 🍃
+<div align="center">
 
-An AI-powered, culturally attuned nutrition and calorie tracker built specifically for Kerala and South Indian diets. Speak or type naturally in **Malayalam**, **Manglish**, or **English** (e.g., *"Randu porotta + beef roast kazhichu"* or *"2 idli sambar coconut chutney"*), and Nadan AI estimates calories and macros while maintaining your daily log and streaks.
+# 🥗 Nadan AI — Multilingual Regional Food Calorie & Macro Tracker
+
+**An AI-powered nutrition web application supporting English, Malayalam, and Manglish food queries using Fuse.js fuzzy search and the Google Gemini Flash API.**
+
+[![Live Demo](https://img.shields.io/badge/Live_App-nadan--ai.vercel.app-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://nadan-ai.vercel.app/)
+[![Next.js](https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)](https://nextjs.org/)
+[![Gemini AI](https://img.shields.io/badge/Google_Gemini_Flash-8E75B2?style=for-the-badge&logo=googlegemini&logoColor=white)](https://ai.google.dev/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
+
+[**🚀 Try Live Demo (nadan-ai.vercel.app)**](https://nadan-ai.vercel.app/) • [Key Features](#key-features) • [How It Works](#hybrid-search--ai-architecture) • [Local Setup](#getting-started-local-development)
+
+</div>
 
 ---
 
-## ✨ Features
+## 📸 Product Preview
 
-- **🗣️ Multilingual & Manglish Comprehension**: Understands Malayalam script, phonetic Manglish, and standard English.
-- **🍛 Kerala Diet Specialization**: Estimates nutritional values for traditional Kerala meals (Porotta, Appam, Kanji, Biriyani, Thoran, etc.).
-- **⚡ AI Nutrition Agent**: Powered by Google Gemini 2.5 Flash through the Vercel AI SDK with function-calling capabilities.
-- **📊 Real-time Database Sync**: Powered by Neon Serverless PostgreSQL and Drizzle ORM.
-- **🎭 Dynamic AI Vibe & Mood**: Adapts coaching personality (from "Hype Man" to "Strict Coach") depending on daily intake targets.
-- **🌓 Native Dark / Light Mode**: Seamless theme switching with system preference detection and smooth OKLCH color palettes.
-- **📱 Mobile-First Responsive UI**: Styled with modern Tailwind CSS v4, custom micro-interactions, and quick-prompt suggestion chips.
+<!-- Tip: Drag and drop 2 screenshots of Nadan AI directly into the GitHub README editor -->
+| Multilingual Search (English, Malayalam & Manglish) | AI Nutritional & Macro Breakdown |
+| :---: | :---: |
+| <img width="643" height="851" alt="Screenshot 2026-10-22 094644" src="https://github.com/user-attachments/assets/3de87103-36af-41ca-9b5c-13ce0c13712e" /> | <img width="640" height="855" alt="Screenshot 2026-10-22 094312" src="https://github.com/user-attachments/assets/7bd86aef-2610-47de-9d97-63a5e8265bfd" /> |
+
+---
+
+## 💡 The Problem & Solution
+
+Mainstream calorie-tracking applications are built around Western food databases and fail to recognize authentic South Indian and Kerala cuisine—or break when users type phonetic transliterations (*Manglish*) with varied spellings (e.g., *"puttu kadala"*, *"kuzhimanthi"*, *"pazham pori"*).
+
+**Nadan AI** solves this with a **Hybrid Search + Generative AI Pipeline**:
+1. **Zero-Latency Fuzzy Search (`Fuse.js`):** Queries first pass through an indexed local dataset configured with weighted fuzzy matching across English names, Malayalam script, and phonetic Manglish variations.
+2. **LLM Fallback & Portion Analysis (`Google Gemini Flash API`):** For custom home-cooked combinations, unindexed dishes, or natural-language meal descriptions, Nadan AI queries the **Gemini Flash LLM** with structured JSON output enforcement to return accurate calorie, protein, carbohydrate, and fat estimates.
+
+---
+
+## ✨ Key Features
+
+- **🗣️ Tri-Lingual Query Engine:** Seamlessly search dishes in **English**, **Malayalam script (മലയാളം)**, or **Manglish** phonetic spelling without worrying about exact typos.
+- **🤖 Gemini Flash AI Nutritionist:** Instant macro-nutrient estimation (Calories, Protein, Carbs, Fats) for complex regional meals and custom portion sizes.
+- **⚡ Sub-Millisecond Local Indexing:** Powered by `Fuse.js` threshold tuning to handle phonetic variations (e.g., matching *biriyani* / *biryani* or *chappathi* / *chapati* instantly).
+- **📊 Daily Macro Dashboard:** Clean, mobile-first progress tracking for daily calorie goals and macro splits.
 
 ---
 
 ## 🛠️ Tech Stack
 
-| Layer | Technology |
-|---|---|
-| **Framework** | [Next.js 16](https://nextjs.org/) (App Router, Turbopack) |
-| **Frontend** | [React 19](https://react.dev/), [Tailwind CSS v4](https://tailwindcss.com/) |
-| **AI Engine** | [Vercel AI SDK](https://sdk.vercel.ai/) (`ai`, `@ai-sdk/google`) |
-| **LLM Model** | Google Gemini 2.5 Flash |
-| **Database & ORM** | [Neon Serverless PostgreSQL](https://neon.tech/), [Drizzle ORM](https://orm.drizzle.team/) |
-| **Type Safety & Validation** | [TypeScript 5](https://www.typescriptlang.org/), [Zod](https://zod.dev/) |
+| Layer | Technologies Used |
+| :--- | :--- |
+| **Frontend & Routing** | Next.js, React, JavaScript, Tailwind CSS |
+| **Search Engine** | Fuse.js (Client-side weighted fuzzy search across multilingual keys) |
+| **AI / LLM Integration** | Google Gemini Flash API (Structured JSON nutritional parsing) |
+| **Deployment** | Vercel |
 
 ---
 
-## 📁 Project Structure
+## 🚀 Getting Started (Local Development)
 
-```text
-nadan-ai/
-├── src/
-│   ├── actions/
-│   │   └── dbActions.ts        # Server actions for database operations & food logging
-│   ├── app/
-│   │   ├── api/
-│   │   │   └── chat/
-│   │   │       └── route.ts    # Streaming AI chat endpoint with tool execution
-│   │   ├── globals.css         # OKLCH design system, theme variables & animations
-│   │   ├── icon.svg            # SVG application favicon & tab brand icon
-│   │   ├── layout.tsx          # Root layout with fonts (Syne & DM Sans)
-│   │   └── page.tsx            # Main chat interface & interactive state
-│   ├── db/
-│   │   ├── index.ts            # Neon client & Drizzle database instance
-│   │   └── schema.ts           # Drizzle schema (users, daily_logs, food_entries)
-│   └── lib/
-│       └── utils.ts            # Reusable utility functions (cn helper)
-├── public/                     # Public static assets
-├── drizzle.config.ts           # Drizzle Kit configuration
-├── components.json             # Shadcn UI configuration
-├── eslint.config.mjs           # ESLint configuration
-├── tsconfig.json               # TypeScript configuration with @/* path alias
-├── package.json                # Dependencies and project scripts
-├── .env.example                # Example environment variable template
-└── README.md                   # Project documentation
+### 1. Clone the repository
+```bash
+git clone [https://github.com/Irshad-konnola/nadan-ai.git](https://github.com/Irshad-konnola/nadan-ai.git)
+cd nadan-ai
 ```
 
----
-
-## 🚀 Getting Started
-
-### Prerequisites
-
-- **Node.js**: v18.18.0 or newer
-- **Neon Database**: A free serverless PostgreSQL database at [neon.tech](https://neon.tech)
-- **Google AI API Key**: An API key from [Google AI Studio](https://aistudio.google.com/app/apikey)
-
-### 1. Clone & Install Dependencies
-
+### 2. Install dependencies
 ```bash
-git clone https://github.com/your-username/nadan-ai.git
-cd nadan-ai
 npm install
 ```
 
-### 2. Configure Environment Variables
-
-Copy `.env.example` to `.env.local`:
-
+### 3. Configure Environment Variables
+Create a `.env.local` file in the root directory:
 ```bash
 cp .env.example .env.local
 ```
 
-Open `.env.local` and add your credentials:
-
+Add your Google Gemini API key:
 ```env
-# Neon PostgreSQL Connection String
-DATABASE_URL="postgresql://user:password@endpoint-pooler.region.aws.neon.tech/neondb?sslmode=require"
-
-# Google Gemini API Key
-GOOGLE_GENERATIVE_AI_API_KEY="AIzaSy..."
+GEMINI_API_KEY=your_google_gemini_api_key_here
 ```
 
-### 3. Initialize the Database
-
-Push the schema to your Neon PostgreSQL instance:
-
-```bash
-npm run db:push
-```
-
-You can view and manage your data with Drizzle Studio:
-
-```bash
-npm run db:studio
-```
-
-### 4. Run the Development Server
-
+### 4. Start the development server
 ```bash
 npm run dev
 ```
-
-Open [http://localhost:3000](http://localhost:3000) in your browser.
-
----
-
-## 📜 Available Scripts
-
-| Command | Description |
-|---|---|
-| `npm run dev` | Starts the Next.js development server with Turbopack |
-| `npm run build` | Compiles an optimized production build |
-| `npm run start` | Runs the compiled production server |
-| `npm run lint` | Runs ESLint across the codebase |
-| `npm run db:push` | Pushes the Drizzle schema directly to the database |
-| `npm run db:generate` | Generates SQL migration files |
-| `npm run db:migrate` | Applies pending migrations to the database |
-| `npm run db:studio` | Launches Drizzle Studio in the browser to view tables |
+Open `http://localhost:3000` in your browser.
 
 ---
 
 ## 📄 License
-
-This project is open-source and available under the [MIT License](LICENSE).
+Distributed under the MIT License. Built by [Irshad Konnola](https://irshadkonnola.vercel.app/).
