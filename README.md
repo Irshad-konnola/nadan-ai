@@ -20,7 +20,7 @@
 <!-- Tip: Drag and drop 2 screenshots of Nadan AI directly into the GitHub README editor -->
 | Multilingual Search (English, Malayalam & Manglish) | AI Nutritional & Macro Breakdown |
 | :---: | :---: |
-| <img width="643" height="851" alt="Screenshot 2026-10-22 094644" src="https://github.com/user-attachments/assets/3de87103-36af-41ca-9b5c-13ce0c13712e" /> | <img width="640" height="855" alt="Screenshot 2026-10-22 094312" src="https://github.com/user-attachments/assets/7bd86aef-2610-47de-9d97-63a5e8265bfd" /> |
+| <img width="640" height="855" alt="Screenshot 2026-10-22 094312" src="https://github.com/user-attachments/assets/7bd86aef-2610-47de-9d97-63a5e8265bfd" /> | <img width="643" height="851" alt="Screenshot 2026-10-22 094644" src="https://github.com/user-attachments/assets/3de87103-36af-41ca-9b5c-13ce0c13712e" /> |
 
 ---
 
